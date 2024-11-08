@@ -25,6 +25,7 @@ evals<-read.csv("data/evals.csv", row.names=1)
 
 ```{r viz-score}
 # add code here
+
 ```
 
 *Add your other details and narratives here.*
@@ -33,9 +34,12 @@ evals<-read.csv("data/evals.csv", row.names=1)
 
 ```{r scatterplot}
 # add code here
+evals %>% ggplot(mapping = aes(y = score)) + geom_boxplot()
+
+evals %>% ggplot(mapping = aes(x = score, y = bty_avg)) + geom_point() + geom_jitter() + geom_smooth(method = "lm", se = FALSE, formula = y ~ x)
 ```
 
-*Add your narrative and other details here.*
+Jitter adds some randomness to your datasets, which is useful in handling overplotting, which may be cause by discreteness in smaller datasets.
 
 # Exercise 2: Simple Linear regression with a numerical predictor
 
@@ -45,20 +49,21 @@ evals<-read.csv("data/evals.csv", row.names=1)
 # remove eval = FALSE from the code chunk options after filling in the blanks
 score_bty_fit <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(___ ~ ___, data = ___)
+  fit(`score` ~ `bty_avg`, data = evals)
 ```
 
 ```{r tidy-score_bty_fit, eval = FALSE}
 # remove eval = FALSE from the code chunk options after filling in the blanks
-tidy(___)
+tidy(score_bty_fit)
 ```
-
+score = 3.88 + 0.07*bty_avg
 *Add your linear model here. Don't worry too much about notation, you can use things like score-hat.*
 
 2. Plot the data again using `geom_jitter()`, and add the regression line.
 
 ```{r viz-score_bty_fit,eval=FALSE}
 # add your plot here. Hint, you can add the regression line using geom_smooth()
+evals %>% ggplot(mapping = aes(x = bty_avg, y = score)) + geom_jitter() + geom_smooth(method = "lm", se = FALSE, formula = y ~ x)
 ```
 
 3. Interpret the slope of the linear model in context of the data.
@@ -73,7 +78,7 @@ tidy(___)
 
 ```{r R2, eval = FALSE}
 # remove eval = FALSE from the code chunk options after filling in the blanks
-glance(___)$___
+glance(score_bty_fit)$r.squared
 ```
 
 *Add your interpretation here*
@@ -83,8 +88,8 @@ glance(___)$___
 ```{r viz-score_bty_fit-diagnostic, eval = FALSE}
 # remove eval = FALSE from the code chunk options after filling in the blanks
 score_bty_aug <- augment(score_bty_fit$fit)
-
-ggplot(___) + ...
+score_bty_aug %>%
+ggplot(mapping = aes(x = .resid, y = .fitted)) + geom_jitter()
 ```
 
 # Exercise 3: Simple Linear regression with a categorical predictor
@@ -92,15 +97,18 @@ ggplot(___) + ...
 0. Look at the variable rank, and determine the frequency of each category level.
 
 ```{r}
-# ... 
+evals %>% count(rank)
 ```
 
 1. Fit a new linear model called `score_rank_fit` to predict average professor evaluation `score` based on `rank` of the professor.
 
 ```{r fit-score_rank_fit}
 # fit model
-
+score_rank_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(`score` ~ `rank`, data = evals)
 # tidy model output
+tidy(score_rank_fit)
 ```
 
 *Add your narrative here.*
